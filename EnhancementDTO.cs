@@ -6,5 +6,13 @@ using PerfectRandom.Sulfur.Core.Items;
 public class EnhancementDTO
 {
     public string name;
-    public List<string> modifiers;
+    public List<ModifierDTO> modifiers;
+}
+
+[Serializable]
+public class ModifierDTO
+{
+    public string modifierName;
+    public string statModType;
+    public float value;
 }
