@@ -39,20 +39,42 @@ public class Plugin : BaseUnityPlugin
 
     public void ExportDB(EnchantmentDatabase db)
     {
-        var list = new List<EnhancementDTO>();
+        var OilList = new List<EnhancementDTO>();
+        var scrollList = new List<EnhancementDTO>();
 
-        foreach (var enchantment in db.GetRawList())
+        foreach (var enhancement in db.GetRawList())
         {
-            list.Add(new EnhancementDTO
+            var enhancementModifiers = new List<string>();
+
+            foreach (var mod in enhancement.modifiersApplied)
             {
-                name = enchantment.enchantmentName,
-                modifiers = enchantment.modifiersApplied,
-            });
+                enhancementModifiers.Add(mod.ToString());
+            }
+
+            var enhancementDTO = new EnhancementDTO
+            {
+                name = enhancement.enchantmentName,
+                modifiers = enhancementModifiers
+            };
+
+            if (enhancementDTO.name.Contains("Oil"))
+            {
+                OilList.Add(enhancementDTO);
+            }
+            else
+            {
+                scrollList.Add(enhancementDTO);
+            }
         }
 
-        string json = JsonConvert.SerializeObject(list, Formatting.Indented);
+        string json = JsonConvert.SerializeObject(OilList, Formatting.Indented);
 
         string path = Path.Combine(Paths.GameRootPath, "enchantments.json");
+        File.WriteAllText(path, json);
+
+        json = JsonConvert.SerializeObject(scrollList, Formatting.Indented);
+        
+        path = Path.Combine(Paths.GameRootPath, "scrolls.json");
         File.WriteAllText(path, json);
     }
 }
