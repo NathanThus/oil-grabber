@@ -4,6 +4,7 @@ A simple plugin that gets all of the data about the various enhancements in the 
 
 ## Requirements
 Bepinex 5.6.X
+
 Sulfur - [Available at](https://store.steampowered.com/app/2124120/SULFUR/)
 
 ## Usage
