@@ -6,6 +6,7 @@ using BepInEx;
 using BepInEx.Logging;
 using Newtonsoft.Json;
 using PerfectRandom.Sulfur.Core;
+using PerfectRandom.Sulfur.Core.CharacterStats;
 using PerfectRandom.Sulfur.Core.Items;
 using UnityEngine;
 
@@ -44,17 +45,20 @@ public class Plugin : BaseUnityPlugin
 
         foreach (var enhancement in db.GetRawList())
         {
-            var enhancementModifiers = new List<string>();
-
+            List<ModifierDTO> itemModifiers = new();
             foreach (var mod in enhancement.modifiersApplied)
             {
-                enhancementModifiers.Add(mod.ToString());
+                itemModifiers.Add(new ModifierDTO
+                {
+                    modifierName = mod.attribute.ToString(),
+                    statModType = FromStatModTypeToString(mod.modType),
+                    value = mod.value
+                });
             }
-
             var enhancementDTO = new EnhancementDTO
             {
                 name = enhancement.enchantmentName,
-                modifiers = enhancementModifiers
+                modifiers = itemModifiers
             };
 
             if (enhancementDTO.name.Contains("Oil"))
@@ -69,7 +73,7 @@ public class Plugin : BaseUnityPlugin
 
         string json = JsonConvert.SerializeObject(OilList, Formatting.Indented);
 
-        string path = Path.Combine(Paths.GameRootPath, "enchantments.json");
+        string path = Path.Combine(Paths.GameRootPath, "oils.json");
         File.WriteAllText(path, json);
 
         json = JsonConvert.SerializeObject(scrollList, Formatting.Indented);
@@ -77,4 +81,13 @@ public class Plugin : BaseUnityPlugin
         path = Path.Combine(Paths.GameRootPath, "scrolls.json");
         File.WriteAllText(path, json);
     }
+
+    
+    public string FromStatModTypeToString(StatModType modtype) => modtype switch
+    {
+        StatModType.Flat        => "Flat",
+        StatModType.PercentAdd  => "PercentAdd",
+        StatModType.PercentMult => "PercentMult",
+        _ => throw new ArgumentOutOfRangeException(nameof(modtype), $"Not expected direction value: {modtype}"),
+    };
 }
